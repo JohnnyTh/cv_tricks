@@ -3,7 +3,7 @@ from conan.tools.cmake import CMakeToolchain, CMake, cmake_layout, CMakeDeps
 
 
 class cv_tricksRecipe(ConanFile):
-    name = "cv-tricks"
+    name = "cv_tricks"
     version = "0.1"
     package_type = "library"
 
@@ -22,6 +22,10 @@ class cv_tricksRecipe(ConanFile):
     # Sources are located in the same place as this recipe, copy them to the recipe
     exports_sources = "CMakeLists.txt", "src/*"
 
+    def requirements(self):
+        for req in self.conan_data["requirements"]:
+            self.requires(req)
+
     def config_options(self):
         if self.settings.os == "Windows":
             self.options.rm_safe("fPIC")
@@ -32,7 +36,7 @@ class cv_tricksRecipe(ConanFile):
 
     def layout(self):
         cmake_layout(self)
-    
+
     def generate(self):
         deps = CMakeDeps(self)
         deps.generate()
@@ -50,4 +54,3 @@ class cv_tricksRecipe(ConanFile):
 
     def package_info(self):
         self.cpp_info.libs = ["cv-tricks"]
-
