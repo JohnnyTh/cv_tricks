@@ -3,3 +3,6 @@
 
 requirements:
   - "spdlog/1.14.1"
+  - "opengl/system"
+  - "glfw/3.4"
+  - "glew/2.2.0"

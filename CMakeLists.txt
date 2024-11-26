@@ -3,5 +3,9 @@ project(cv_tricks CXX)
 
 find_package("spdlog" REQUIRED)
 
+find_package(GLEW REQUIRED)
+find_package(OpenGL REQUIRED)
+find_package(glfw3 REQUIRED)
+
 add_executable(${PROJECT_NAME} "src/cv_tricks.cpp")
 target_link_libraries(${PROJECT_NAME} spdlog::spdlog)
