@@ -1,8 +1,9 @@
 #include <spdlog/spdlog.h>
 
-#include <vector>
 #include <string>
+#include <vector>
 
+#include "render_loop.hpp"
 
 void cv_tricks_print_vector(const std::vector<std::string>& strings) {
   for (const auto& string : strings) {
@@ -11,5 +12,6 @@ void cv_tricks_print_vector(const std::vector<std::string>& strings) {
 }
 
 int main(int argc, char* argv[]) {
-  cv_tricks_print_vector({"val1", "val2"});
+  auto loop = RenderLoop();
+  loop.run();
 }
