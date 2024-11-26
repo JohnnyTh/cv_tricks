@@ -88,10 +88,13 @@ class RenderLoop {
       render();
 
       glfwSwapBuffers(window);
+      glfwPollEvents();
 
       if (glfwWindowShouldClose(window)) {
         is_running = false;
       }
+
+      shutdown();
     }
   };
 };
