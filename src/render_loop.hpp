@@ -6,6 +6,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "irenderable.hpp"
+
 #ifndef CV_TRICKS_RENDER_LOOP_HPP
 #define CV_TRICKS_RENDER_LOOP_HPP
 
@@ -15,6 +17,8 @@ static void glfw_error_callback(int error, const char* description) {
 
 class RenderLoop {
  public:
+  std::vector<std::shared_ptr<IRenderable>> renderables;
+
   RenderLoop() = default;
 
   bool is_running = false;
@@ -54,6 +58,10 @@ class RenderLoop {
       return -1;
     }
 
+    for (const auto& renderable : renderables) {
+      renderable->initialize();
+    }
+
     spdlog::info("Finish init");
     return 1;
   };
@@ -65,7 +73,11 @@ class RenderLoop {
   };
   void update(float deltaTime){};
 
-  void render(){};
+  void render() {
+    for (const auto& renderable : renderables) {
+      renderable->render();
+    }
+  };
 
   int run() {
     auto status = initialize();
@@ -74,6 +86,7 @@ class RenderLoop {
     }
 
     spdlog::info("Enter render loop...");
+    is_running = true;
 
     while (is_running) {
       static double last_time = glfwGetTime();
@@ -93,10 +106,13 @@ class RenderLoop {
       if (glfwWindowShouldClose(window)) {
         is_running = false;
       }
-
-      shutdown();
     }
+    shutdown();
   };
+
+  void add_renderable(const std::shared_ptr<IRenderable>& renderable) {
+    renderables.push_back(renderable);
+  }
 };
 
 #endif  // CV_TRICKS_RENDER_LOOP_HPP

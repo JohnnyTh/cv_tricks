@@ -11,6 +11,10 @@ add_executable(
         ${PROJECT_NAME}
         "src/cv_tricks.cpp"
         "src/render_loop.hpp"
+        src/irenderable.hpp
+        src/renderables.hpp
+        src/shader.hpp
+        src/utilities/utils_shaders.hpp
 )
 target_link_libraries(
         ${PROJECT_NAME}

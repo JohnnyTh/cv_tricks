@@ -1,17 +1,17 @@
 #include <spdlog/spdlog.h>
 
-#include <string>
-#include <vector>
-
 #include "render_loop.hpp"
-
-void cv_tricks_print_vector(const std::vector<std::string>& strings) {
-  for (const auto& string : strings) {
-    spdlog::info("cv_tricks/0.1 {}", string);
-  }
-}
+#include "renderables.hpp"
 
 int main(int argc, char* argv[]) {
+  auto shader = Shader("../src/shaders/fullscreen_quad.vert",
+                       "../src/shaders/fullscreen_quad.frag");
+
+  auto quad = std::make_shared<FullScreenQuad>(shader);
+
   auto loop = RenderLoop();
+  loop.add_renderable(quad);
+  loop.initialize();
+
   loop.run();
 }
