@@ -11,7 +11,6 @@
 
 class FullScreenQuad : public IRenderable {
  public:
-
   unsigned int vao{}, vbo{}, ebo{};
 
   explicit FullScreenQuad(Shader& shader) : IRenderable(shader) {}
@@ -21,14 +20,30 @@ class FullScreenQuad : public IRenderable {
 
     float quad_vertices[] = {
         // Positions    // TexCoords
-        -1.0f, 1.0f,  0.0f, 1.0f,  // Top-left
-        -1.0f, -1.0f, 0.0f, 0.0f,  // Bottom-left
-        1.0f,  -1.0f, 1.0f, 0.0f,  // Bottom-right
-        1.0f,  1.0f,  1.0f, 1.0f   // Top-right
+        -1.0f,
+        1.0f,
+        0.0f,
+        1.0f,  // Top-left
+        -1.0f,
+        -1.0f,
+        0.0f,
+        0.0f,  // Bottom-left
+        1.0f,
+        -1.0f,
+        1.0f,
+        0.0f,  // Bottom-right
+        1.0f,
+        1.0f,
+        1.0f,
+        1.0f  // Top-right
     };
     unsigned int quad_indices[] = {
-        0, 1, 2,  // First triangle
-        0, 2, 3   // Second triangle
+        0,
+        1,
+        2,  // First triangle
+        0,
+        2,
+        3  // Second triangle
     };
 
     // Generate VAO and VBO
@@ -40,26 +55,37 @@ class FullScreenQuad : public IRenderable {
 
     // Vertex Buffer
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(quad_vertices), quad_vertices,
-                 GL_STATIC_DRAW);
+    glBufferData(
+        GL_ARRAY_BUFFER, sizeof(quad_vertices), quad_vertices, GL_STATIC_DRAW);
 
     // Element Buffer
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(quad_indices), quad_indices,
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                 sizeof(quad_indices),
+                 quad_indices,
                  GL_STATIC_DRAW);
 
     // Vertex attributes
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
+    glVertexAttribPointer(0,
+                          2,
+                          GL_FLOAT,
+                          GL_FALSE,
+                          4 * sizeof(float),
                           (void*)nullptr);  // Position
+
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
+    glVertexAttribPointer(1,
+                          2,
+                          GL_FLOAT,
+                          GL_FALSE,
+                          4 * sizeof(float),
                           (void*)(2 * sizeof(float)));  // TexCoords
     glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);  // Unbind VAO
   }
 
-  ~FullScreenQuad() override  {
+  ~FullScreenQuad() override {
     glDeleteVertexArrays(1, &vao);
     glDeleteBuffers(1, &vbo);
     glDeleteBuffers(1, &ebo);

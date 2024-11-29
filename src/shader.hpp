@@ -23,8 +23,8 @@ class Shader {
         fragment_path(std::move(fragment_path_in)) {}
 
   void load_shader() {
-    // should be called within RenderLoop only after the proper OpenGL context
-    // is created (e.g. GLFWwindow* window is created)
+    // should be called within RenderLoop only after the proper OpenGL
+    // context is created (e.g. GLFWwindow* window is created)
     program_id = utils_shaders::load_shaders(vertex_path, fragment_path);
     check_program_loaded();
   }

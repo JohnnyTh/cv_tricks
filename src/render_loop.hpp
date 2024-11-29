@@ -38,10 +38,11 @@ class RenderLoop {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window =
-        glfwCreateWindow(glfwGetVideoMode(glfwGetPrimaryMonitor())->width,
-                         glfwGetVideoMode(glfwGetPrimaryMonitor())->height,
-                         "Mandelbrot render", glfwGetPrimaryMonitor(), nullptr);
+    window = glfwCreateWindow(glfwGetVideoMode(glfwGetPrimaryMonitor())->width,
+                              glfwGetVideoMode(glfwGetPrimaryMonitor())->height,
+                              "Render program",
+                              glfwGetPrimaryMonitor(),
+                              nullptr);
 
     if (window == nullptr) {
       spdlog::error(

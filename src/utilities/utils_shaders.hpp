@@ -23,6 +23,7 @@ GLuint load_shaders(const std::string& vertex_file_path,
   // Read the Vertex Shader code from the file
   std::string VertexShaderCode;
   std::ifstream VertexShaderStream(vertex_file_path, std::ios::in);
+
   if (VertexShaderStream.is_open()) {
     std::stringstream sstr;
     sstr << VertexShaderStream.rdbuf();
@@ -61,8 +62,8 @@ GLuint load_shaders(const std::string& vertex_file_path,
   glGetShaderiv(VertexShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
   if (InfoLogLength > 0) {
     std::vector<char> VertexShaderErrorMessage(InfoLogLength + 1);
-    glGetShaderInfoLog(VertexShaderID, InfoLogLength, nullptr,
-                       &VertexShaderErrorMessage[0]);
+    glGetShaderInfoLog(
+        VertexShaderID, InfoLogLength, nullptr, &VertexShaderErrorMessage[0]);
     spdlog::info("{}", &VertexShaderErrorMessage[0]);
   }
 
@@ -78,7 +79,9 @@ GLuint load_shaders(const std::string& vertex_file_path,
 
   if (InfoLogLength > 0) {
     std::vector<char> FragmentShaderErrorMessage(InfoLogLength + 1);
-    glGetShaderInfoLog(FragmentShaderID, InfoLogLength, nullptr,
+    glGetShaderInfoLog(FragmentShaderID,
+                       InfoLogLength,
+                       nullptr,
                        &FragmentShaderErrorMessage[0]);
     spdlog::info("{}", &FragmentShaderErrorMessage[0]);
   }
@@ -93,10 +96,11 @@ GLuint load_shaders(const std::string& vertex_file_path,
   // Check the program
   glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
   glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+
   if (InfoLogLength > 0) {
     std::vector<char> ProgramErrorMessage(InfoLogLength + 1);
-    glGetProgramInfoLog(ProgramID, InfoLogLength, nullptr,
-                        &ProgramErrorMessage[0]);
+    glGetProgramInfoLog(
+        ProgramID, InfoLogLength, nullptr, &ProgramErrorMessage[0]);
     spdlog::info("{}", &ProgramErrorMessage[0]);
   }
 
