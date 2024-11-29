@@ -4,10 +4,10 @@
 #include "renderables.hpp"
 
 int main(int argc, char* argv[]) {
-  auto shader = Shader("../src/shaders/fullscreen_quad.vert",
-                       "../src/shaders/fullscreen_quad.frag");
+  auto shader = Shader("../src/shaders/light_source.vert",
+                       "../src/shaders/light_source.frag");
 
-  auto quad = std::make_shared<FullScreenQuad>(shader);
+  auto quad = std::make_shared<LightSource>(shader, 0.0, 0.0, 0.1);
 
   auto loop = RenderLoop();
   loop.add_renderable(quad);
