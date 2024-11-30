@@ -104,7 +104,8 @@ class RenderLoop {
       glfwSwapBuffers(window);
       glfwPollEvents();
 
-      if (glfwWindowShouldClose(window)) {
+      if (glfwWindowShouldClose(window) ||
+          glfwGetKey(window, GLFW_KEY_ESCAPE)) {
         is_running = false;
       }
     }

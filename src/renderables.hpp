@@ -167,8 +167,8 @@ class LightSource : public IRenderable {
   void render() override {
     shader.use();
     glBindVertexArray(vao);
-    //  glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
   }
 };
