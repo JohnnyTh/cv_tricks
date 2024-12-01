@@ -19,7 +19,8 @@ class FullScreenQuad : public IRenderable {
 
   explicit FullScreenQuad(Shader& shader) : IRenderable(shader) {}
 
-  void initialize() override {
+  void initialize(std::shared_ptr<GLFWwindow> new_window) override {
+    window = new_window;
     shader.load_shader();
 
     float quad_vertices[] = {
@@ -125,8 +126,9 @@ class LightSource : public IRenderable {
         outer_radius(outer_radius),
         color_rgb(color_rgb) {}
 
-  void initialize() override {
+  void initialize(std::shared_ptr<GLFWwindow> new_window) override {
     shader.load_shader();
+    window = new_window;
 
     float vertices[] = {-1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f};
 
@@ -156,6 +158,8 @@ class LightSource : public IRenderable {
   void render() override {
     shader.use();
     glClear(GL_COLOR_BUFFER_BIT);
+
+    set_shader_aspect_ratio();
 
     auto center_loc = glGetUniformLocation(shader.program_id, "center");
     auto outer_radius_loc =

@@ -22,7 +22,7 @@ class RenderLoop {
   RenderLoop() = default;
 
   bool is_running = false;
-  GLFWwindow* window{};
+  std::shared_ptr<GLFWwindow> window{};
 
   int initialize() {
     spdlog::info("Start init");
@@ -38,11 +38,13 @@ class RenderLoop {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window = glfwCreateWindow(glfwGetVideoMode(glfwGetPrimaryMonitor())->width,
-                              glfwGetVideoMode(glfwGetPrimaryMonitor())->height,
-                              "Render program",
-                              glfwGetPrimaryMonitor(),
-                              nullptr);
+    window = std::shared_ptr<GLFWwindow>(
+        glfwCreateWindow(glfwGetVideoMode(glfwGetPrimaryMonitor())->width,
+                         glfwGetVideoMode(glfwGetPrimaryMonitor())->height,
+                         "Render program",
+                         glfwGetPrimaryMonitor(),
+                         nullptr),
+        [](GLFWwindow* w) { glfwDestroyWindow(w); });
 
     if (window == nullptr) {
       spdlog::error(
@@ -51,8 +53,8 @@ class RenderLoop {
       glfwTerminate();
       return -1;
     }
-    glfwMakeContextCurrent(window);
-    glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
+    glfwMakeContextCurrent(window.get());
+    glfwSetInputMode(window.get(), GLFW_STICKY_KEYS, GL_TRUE);
 
     if (glewInit() != GLEW_OK) {
       spdlog::error("Failed to initialize GLEW");
@@ -60,7 +62,7 @@ class RenderLoop {
     }
 
     for (const auto& renderable : renderables) {
-      renderable->initialize();
+      renderable->initialize(window);
     }
 
     spdlog::info("Finish init");
@@ -101,11 +103,11 @@ class RenderLoop {
 
       render();
 
-      glfwSwapBuffers(window);
+      glfwSwapBuffers(window.get());
       glfwPollEvents();
 
-      if (glfwWindowShouldClose(window) ||
-          glfwGetKey(window, GLFW_KEY_ESCAPE)) {
+      if (glfwWindowShouldClose(window.get()) ||
+          glfwGetKey(window.get(), GLFW_KEY_ESCAPE)) {
         is_running = false;
       }
     }

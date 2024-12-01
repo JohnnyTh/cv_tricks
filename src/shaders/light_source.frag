@@ -7,9 +7,13 @@ uniform vec2 center; // Center of the circle (in normalized device coordinates)
 uniform float outerRadius; // Outer radius of the ring
 uniform float innerRadius; // Inner radius of the ring
 uniform vec3 color;
+uniform float aspectRatio;
 
 void main() {
-    float dist = length(fragPos - center);
+    vec2 adjustedPos = vec2(fragPos.x * aspectRatio, fragPos.y);
+    vec2 adjustedCenter = vec2(center.x * aspectRatio, center.y);
+
+    float dist = length(adjustedPos - adjustedCenter);
 
     // Discard fragments outside the circle
     if (dist >= outerRadius) {
