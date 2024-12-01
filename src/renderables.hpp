@@ -3,6 +3,8 @@
 //
 #include <GL/glew.h>
 
+#include <array>
+
 #include "irenderable.hpp"
 #include "shader.hpp"
 
@@ -106,56 +108,43 @@ class LightSource : public IRenderable {
   unsigned int vao{}, vbo{}, ebo{};
   float center_x;
   float center_y;
-  float radius;
-
-  int ATTRIB_VERTEX = 0;  // Location for vertex position attribute
-  int ATTRIB_VALUE =
-      1;  // Location for other attribute (e.g., texture coordinates)
+  float outer_radius;
+  float inner_radius;
+  std::array<float, 3> color_rgb;
 
   explicit LightSource(Shader& shader,
+                       std::array<float, 3> color_rgb,
                        float center_x = 0.0,
                        float center_y = 0.0,
-                       float radius = 0.0)
+                       float inner_radius = 0.0,
+                       float outer_radius = 0.0)
       : IRenderable(shader),
         center_x(center_x),
         center_y(center_y),
-        radius(radius) {}
+        inner_radius(inner_radius),
+        outer_radius(outer_radius),
+        color_rgb(color_rgb) {}
 
   void initialize() override {
     shader.load_shader();
 
-    auto left = center_x - radius;
-    auto right = center_x + radius;
-    auto bottom = center_y - radius;
-    auto top = center_y + radius;
-    float quad[20] = {
-        right, bottom, 0, 1.0,  -1.0, right, top,    0, 1.0,  1.0,
-        left,  top,    0, -1.0, 1.0,  left,  bottom, 0, -1.0, -1.0,
-    };
+    float vertices[] = {-1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f};
 
     // Generate and Bind Buffers
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
-    glGenBuffers(1, &ebo);
 
-    unsigned int glBuffer;
-    glGenBuffers(1, &glBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, glBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 20, quad, GL_STATIC_DRAW);
+    glBindVertexArray(vao);
 
-    // Configure Vertex Attributes
-    glEnableVertexAttribArray(ATTRIB_VERTEX);
-    glEnableVertexAttribArray(ATTRIB_VALUE);
-    glVertexAttribPointer(ATTRIB_VERTEX, 3, GL_FLOAT, GL_FALSE, 20, nullptr);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
     glVertexAttribPointer(
-        ATTRIB_VALUE, 2, GL_FLOAT, GL_FALSE, 20, BUFFER_OFFSET(12));
-
-    // unbind resources for safety
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+        0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)nullptr);
+    glEnableVertexAttribArray(0);
 
     glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   }
 
   ~LightSource() override {
@@ -166,9 +155,24 @@ class LightSource : public IRenderable {
 
   void render() override {
     shader.use();
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    auto center_loc = glGetUniformLocation(shader.program_id, "center");
+    auto outer_radius_loc =
+        glGetUniformLocation(shader.program_id, "outerRadius");
+    auto inner_radius_loc =
+        glGetUniformLocation(shader.program_id, "innerRadius");
+    auto color_loc = glGetUniformLocation(shader.program_id, "color");
+
+    // Update the uniform variables
+    glUniform2f(center_loc, center_x, center_y);  // Center of the ring
+    glUniform1f(outer_radius_loc, outer_radius);  // Outer radius
+    glUniform1f(inner_radius_loc, inner_radius);  // Inner radius
+    glUniform3fv(color_loc, 1, color_rgb.data());
+
     glBindVertexArray(vao);
-    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-    //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
     glBindVertexArray(0);
   }
 };
