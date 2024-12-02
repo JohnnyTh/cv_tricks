@@ -74,8 +74,17 @@ class RenderLoop {
     // renderer.cleanup();
     spdlog::info("Application terminated cleanly.");
   };
-  void update(float deltaTime){};
+  void update(float delta_time, float time_passed) {
+    for (const auto& renderable : renderables) {
+      renderable->update(delta_time, time_passed);
+    }
+  };
 
+  void render() {
+    for (const auto& renderable : renderables) {
+      renderable->render();
+    }
+  }
   int run() {
     auto status = initialize();
     if (status == -1) {
@@ -84,21 +93,21 @@ class RenderLoop {
 
     spdlog::info("Enter render loop...");
     is_running = true;
-
+    float time_passed = 0;
+    static double time_start = glfwGetTime();
+    double time_prev = time_start;
     while (is_running) {
-      static double last_time = glfwGetTime();
-      double current_time = glfwGetTime();
-      auto delta_time = static_cast<float>(current_time - last_time);
-      last_time = current_time;
+      double time_current = glfwGetTime();
+      double delta_time = time_current - time_prev;
+
+      time_prev = time_current;
+      time_passed = time_passed + static_cast<float>(delta_time);
 
       glfwPollEvents();
-
-      update(delta_time);
       glClear(GL_COLOR_BUFFER_BIT);
 
-      for (const auto& renderable : renderables) {
-        renderable->render();
-      }
+      update(static_cast<float>(delta_time), time_passed);
+      render();
 
       glfwSwapBuffers(window.get());
       glfwPollEvents();

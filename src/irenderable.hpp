@@ -16,6 +16,7 @@ class IRenderable {
   virtual ~IRenderable() = default;
   virtual void initialize(std::shared_ptr<GLFWwindow> new_window) = 0;
   virtual void render() = 0;
+  virtual void update(float delta_time, float time_passed_in_loop) = 0;
 
   [[nodiscard]] float get_aspect_ratio() const {
     int width, height;

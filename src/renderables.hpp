@@ -109,22 +109,37 @@ class LightSource : public IRenderable {
   unsigned int vao{}, vbo{}, ebo{};
   float center_x;
   float center_y;
+
+  float outer_radius_initial;
+  float inner_radius_initial;
+
   float outer_radius;
   float inner_radius;
+
+  float oscillate_amplitude;
+  float oscillate_frequency;
+
   std::array<float, 3> color_rgb;
 
   explicit LightSource(Shader& shader,
                        std::array<float, 3> color_rgb,
                        float center_x = 0.0,
                        float center_y = 0.0,
-                       float inner_radius = 0.0,
-                       float outer_radius = 0.0)
+                       float inner_radius_initial = 0.0,
+                       float outer_radius_initial = 0.0,
+                       float oscillate_amplitude = 0.0,
+                       float oscillate_frequency = 0.0)
       : IRenderable(shader),
         center_x(center_x),
         center_y(center_y),
-        inner_radius(inner_radius),
-        outer_radius(outer_radius),
-        color_rgb(color_rgb) {}
+        inner_radius_initial(inner_radius_initial),
+        outer_radius_initial(outer_radius_initial),
+        color_rgb(color_rgb),
+        oscillate_amplitude(oscillate_amplitude),
+        oscillate_frequency(oscillate_frequency) {
+    outer_radius = outer_radius_initial;
+    inner_radius = inner_radius_initial;
+  }
 
   void initialize(std::shared_ptr<GLFWwindow> new_window) override {
     shader.load_shader();
@@ -153,6 +168,14 @@ class LightSource : public IRenderable {
     glDeleteVertexArrays(1, &vao);
     glDeleteBuffers(1, &vbo);
     glDeleteBuffers(1, &ebo);
+  }
+
+  void update(float delta_time, float time_passed_in_loop) override {
+    float radians =
+        2 * static_cast<float>(M_PI) * oscillate_frequency * time_passed_in_loop;
+
+    inner_radius = oscillate_amplitude * sinf(radians) + inner_radius_initial;
+    outer_radius = oscillate_amplitude * sinf(radians) + outer_radius_initial;
   }
 
   void render() override {
