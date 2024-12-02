@@ -15,6 +15,7 @@ add_executable(
         src/renderables.hpp
         src/shader.hpp
         src/utilities/utils_shaders.hpp
+        src/utilities/utils_math.hpp
 )
 target_link_libraries(
         ${PROJECT_NAME}
