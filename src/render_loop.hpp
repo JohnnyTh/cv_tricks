@@ -76,12 +76,6 @@ class RenderLoop {
   };
   void update(float deltaTime){};
 
-  void render() {
-    for (const auto& renderable : renderables) {
-      renderable->render();
-    }
-  };
-
   int run() {
     auto status = initialize();
     if (status == -1) {
@@ -100,8 +94,11 @@ class RenderLoop {
       glfwPollEvents();
 
       update(delta_time);
+      glClear(GL_COLOR_BUFFER_BIT);
 
-      render();
+      for (const auto& renderable : renderables) {
+        renderable->render();
+      }
 
       glfwSwapBuffers(window.get());
       glfwPollEvents();

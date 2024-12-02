@@ -157,7 +157,6 @@ class LightSource : public IRenderable {
 
   void render() override {
     shader.use();
-    glClear(GL_COLOR_BUFFER_BIT);
 
     set_shader_aspect_ratio();
 
