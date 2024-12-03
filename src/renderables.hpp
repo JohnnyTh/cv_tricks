@@ -7,11 +7,10 @@
 
 #include "irenderable.hpp"
 #include "shader.hpp"
+#include "utilities/utils_math.hpp"
 
 #ifndef CV_TRICKS_RENDERABLES_HPP
 #define CV_TRICKS_RENDERABLES_HPP
-
-#define BUFFER_OFFSET(i) ((char*)NULL + (i))
 
 class FullScreenQuad : public IRenderable {
  public:
@@ -110,14 +109,11 @@ class LightSource : public IRenderable {
   float center_x;
   float center_y;
 
-  float outer_radius_initial;
-  float inner_radius_initial;
-
   float outer_radius;
   float inner_radius;
 
-  float oscillate_amplitude;
-  float oscillate_frequency;
+  GaussianOscillation oscillator_inner;
+  GaussianOscillation oscillator_outer;
 
   std::array<float, 3> color_rgb;
 
@@ -127,18 +123,30 @@ class LightSource : public IRenderable {
                        float center_y = 0.0,
                        float inner_radius_initial = 0.0,
                        float outer_radius_initial = 0.0,
-                       float oscillate_amplitude = 0.0,
-                       float oscillate_frequency = 0.0)
+                       float oscillate_frequency = 0.0,
+                       float oscillate_peak_width = 0.0,
+                       float oscillate_max_value = 0.0)
       : IRenderable(shader),
         center_x(center_x),
         center_y(center_y),
-        inner_radius_initial(inner_radius_initial),
-        outer_radius_initial(outer_radius_initial),
-        color_rgb(color_rgb),
-        oscillate_amplitude(oscillate_amplitude),
-        oscillate_frequency(oscillate_frequency) {
+        color_rgb(color_rgb) {
     outer_radius = outer_radius_initial;
     inner_radius = inner_radius_initial;
+
+    auto delta = outer_radius_initial - inner_radius_initial;
+    auto oscillate_max_value_inner = oscillate_max_value - delta;
+
+    oscillator_inner = GaussianOscillation(oscillate_peak_width,
+                                           oscillate_frequency,
+                                           inner_radius_initial,
+                                           oscillate_max_value_inner,
+                                           0.0);
+
+    oscillator_outer = GaussianOscillation(oscillate_peak_width,
+                                           oscillate_frequency,
+                                           outer_radius_initial,
+                                           oscillate_max_value,
+                                           0.25);
   }
 
   void initialize(std::shared_ptr<GLFWwindow> new_window) override {
@@ -171,11 +179,10 @@ class LightSource : public IRenderable {
   }
 
   void update(float delta_time, float time_passed_in_loop) override {
-    float radians =
-        2 * static_cast<float>(M_PI) * oscillate_frequency * time_passed_in_loop;
-
-    inner_radius = oscillate_amplitude * sinf(radians) + inner_radius_initial;
-    outer_radius = oscillate_amplitude * sinf(radians) + outer_radius_initial;
+    inner_radius =
+        static_cast<float>(oscillator_inner.compute(time_passed_in_loop));
+    outer_radius =
+        static_cast<float>(oscillator_outer.compute(time_passed_in_loop));
   }
 
   void render() override {
